@@ -13,3 +13,10 @@ git remote add origin git@github.com:CBFiveash/readme.git
 git branch -M main
 git push -u origin main
 
+
+
+
+git branch -m master main
+git fetch origin
+git branch -u origin/main main
+git remote set-head origin -a
