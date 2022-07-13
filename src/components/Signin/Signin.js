@@ -23,7 +23,6 @@ class Signin extends React.Component {
                 password: this.state.signInPassword
             })
         })
-        // FIX ISSUE OF NOT CHANGING ROUTE TO HOME - REMOVE .ID FROM USER AND GOES TO HOME BUT DOES NOT PASS RANK
             .then(response => response.json())
             .then(user => {
                 if(user.id) {
