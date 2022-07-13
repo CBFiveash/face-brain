@@ -15,6 +15,7 @@ const app = new Clarifai.App({
 });
 
 
+// CREATED INITIAL STATE FOR A CLEAN SIGN IN
 const initialState = {
   input: '',
   imageUrl: '',
@@ -46,12 +47,7 @@ class App extends Component {
     }})
   }
 
-  // componentDidMount() {
-  //   fetch('http://localhost:3001/')
-  //   .then(response => response.json())
-  //   .then(console.log)
-  // }
-
+  // CLARIFAI BOUNDING BOX CONFIG
   calculateFaceLocation = (data) => {
     const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
     const image = document.getElementById('inputimage');
@@ -65,22 +61,25 @@ class App extends Component {
     }
   }
 
+  // CLARIFAI BOX DISPLAY
   displayFaceBox = (box) => {
     this.setState({box: box});
   }
 
+  // IMAGE LINK FORM - INPUT
   onInputChange = (event) => {
     this.setState({input: event.target.value});
   }
 
+  // IMAGE LINK FORM - BTN EVENT
   onSubmit = () => {
-    this.setState({imageUrl: this.state.input});
+    this.setState({imageUrl: this.state.input}); // set btn submit state as input (URL)
     app.models
       .predict(
         Clarifai.FACE_DETECT_MODEL,
-        this.state.input)
-      .then(response => {
-        if(response) {
+        this.state.input) // clarifai model using input url
+      .then(response => { // response conditions
+        if(response) { // success
           fetch('http://localhost:3001/image', {
             method: 'put',
             headers: {'Content-Type': 'application/json'},
@@ -90,33 +89,34 @@ class App extends Component {
           })
           .then(response  => response.json())
           .then(count => {
-            this.setState(Object.assign(this.state.user, { entries: count}))
+            this.setState(Object.assign(this.state.user, { entries: count})) // set user entries count state
           })
           .catch(console.log)
         }
         this.displayFaceBox(this.calculateFaceLocation(response))
       })
         
-      .catch(err => console.log(err))
+      .catch(err => console.log(err)) // fail
   }
 
+  // DETERMINE 'HOME' OR 'SIGNED OUT' STATE
   onRouteChange = (route) => {
     if(route === 'signout') {
-      this.setState(initialState)
+      this.setState(initialState) // clear state for new signin
     } else if(route === 'home') {
       this.setState({isSignedIn: true});
     }
-      this.setState({route: route});
+    this.setState({route: route});
   }
-
+ // {/* */}
   render() {
   return (
     <div className="App">
       {/* <Particles id="tsparticles" /> */}
-      <Navigation isSignedIn={this.state.isSignedIn} onRouteChange={this.onRouteChange}/>
-      { this.state.route === 'home' 
+      <Navigation isSignedIn={this.state.isSignedIn} onRouteChange={this.onRouteChange}/>  {/* always show navigation bar with links dependent on signed in state*/}
+      { this.state.route === 'home' // if route = home page :
         ? <div>
-            <Logo />
+            <Logo /> {/* show logo, rank, image form, and face recognition boxes*/}
             <Rank name={this.state.user.name} entries={this.state.user.entries} />
             <ImageLinkForm 
               onInputChange={this.onInputChange} 
@@ -124,10 +124,10 @@ class App extends Component {
             />
             <FaceRecognition box={this.state.box} imageUrl={this.state.imageUrl} />
           </div>
-        : (
+        : ( // else if route = signin screen:
           this.state.route === 'signin'
-          ? <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange} /> 
-          : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
+          ? <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange} /> // use signin functionality
+          : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange} /> // else use register functionality
         )
       }
     </div>
